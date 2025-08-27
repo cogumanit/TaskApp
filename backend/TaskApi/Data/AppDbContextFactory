@@ -1,0 +1,22 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+namespace TaskApi.Data
+{
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+    {
+        public AppDbContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            
+            // Replace with your actual connection string
+            // For SQL Server:
+            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=TaskApiDb;Trusted_Connection=true;MultipleActiveResultSets=true");
+            
+            // For SQLite (alternative):
+            // optionsBuilder.UseSqlite("Data Source=taskapi.db");
+            
+            return new AppDbContext(optionsBuilder.Options);
+        }
+    }
+}
