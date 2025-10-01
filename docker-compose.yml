@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: ./frontend/task-react
+    container_name: react-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://dotnet-backend:5000
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend/TaskApi
+    container_name: dotnet-backend
+    ports:
+      - "5121:5000"
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=TaskLearningDb;User Id=sa;Password=Your_password123;TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Your_password123
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:

@@ -3,10 +3,10 @@ using TaskApi.Models;
 
 namespace TaskApi.Data
 {
-    //AppDbContext: The EF Core gateway to your database
+    //AppDbContext: The EF Core gateway to your database (acts as the bridge from code to database)
     public class AppDbContext : DbContext
     {
-        // This constructor lets ASP.NET inject options (like the connection string)
+        // this constructor lets ASP.NET inject options (like the connection string)
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public AppDbContext CreateDbContext(string[] args)
@@ -16,7 +16,7 @@ namespace TaskApi.Data
             return new AppDbContext(optionsBuilder.Options);
         }
 
-        // DbSet<T> maps your model to a table (TaskItem -> Tasks)
+        // DbSet<T> maps your model to a table (TaskItem -> Tasks) (specifically map/bridges the TaskItem class to tasks table in db)
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
     }
 }
