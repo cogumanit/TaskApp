@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace TaskApi.Models
 {
-    // POCO = Plain Old CLR Object. EF Core maps this to a DB table. (will create the the table in the db after migrations)
+    //  EF Core maps this to a DB table. (will create the the table in the db after migrations)
     public class TaskItem
     {
         public int Id { get; set; } // Primary Key by convention (Table: Tasks, Column: Id)

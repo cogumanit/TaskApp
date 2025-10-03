@@ -18,5 +18,8 @@ namespace TaskApi.Data
 
         // DbSet<T> maps your model to a table (TaskItem -> Tasks) (specifically map/bridges the TaskItem class to tasks table in db)
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
+        // public DbSet<User> Users => Set<User>();
+
+        public DbSet<User> Users { get; set; }
     }
 }

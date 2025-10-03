@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using TaskApi.Data;
 using TaskApi.Models;
 
 namespace TaskApi.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")] // -> /api/tasks
     public class TasksController : ControllerBase
     {
