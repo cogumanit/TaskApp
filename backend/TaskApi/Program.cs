@@ -78,9 +78,15 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // 3) Allow CORS for React dev (Vite: 5173, CRA: 3000)
-builder.Services.AddCors(opt =>
+builder.Services.AddCors(options =>
 {
-    opt.AddPolicy("DevCors", p => p.WithOrigins("http://localhost:5173", "http://localhost:3000", "http://localhost:5121").AllowAnyHeader().AllowAnyMethod());
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "http://localhost:5121")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
 
 var app = builder.Build();

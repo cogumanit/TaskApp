@@ -11,10 +11,15 @@
     "tailwind:init": "tailwindcss init -p"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.4",
+    "axios": "^1.12.2",
     "file-saver": "^2.0.5",
     "lucide": "^0.542.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.3",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -22,14 +27,16 @@
     "@tailwindcss/postcss": "^4.1.12",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@vitejs/plugin-react": "^5.0.0",
+    "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
-    "eslint": "^9.33.0",
+    "eslint": "^9.36.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.12",
-    "vite": "^7.1.2"
+    "vite": "^7.1.9"
   }
 }

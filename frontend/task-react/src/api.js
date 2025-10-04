@@ -1,68 +1,73 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5121';
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5121";
 
 export const api = {
-  // GET
-  async getTasks() {
-    try {
-      const response = await fetch(`${BASE_URL}/api/Tasks`);
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-      throw new Error('Failed to load tasks. Please try again.');
-    }
+  // --- AUTH ---
+  async login(credentials) {
+    const response = await fetch(`${BASE_URL}/api/Auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials),
+    });
+    if (!response.ok) throw new Error("Login failed");
+    return await response.json(); // returns { token, user }
   },
 
-  // CREATE
-  async createTask(taskData) {
-    try {
-      const response = await fetch(`${BASE_URL}/api/Tasks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(taskData),
-      });
-      if (!response.ok) throw new Error('Failed to create task');
-      return await response.json();
-    } catch (error) {
-      console.error('Error creating task:', error);
-      throw new Error('Failed to create task. Please try again.');
-    }
+  async register(userData) {
+    const response = await fetch(`${BASE_URL}/api/Auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+    if (!response.ok) throw new Error("Registration failed");
+    return await response.json();
   },
 
-  // UPDATE
-  async updateTask(id, taskData) {
-    try {
-      const response = await fetch(`${BASE_URL}/api/Tasks/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(taskData),
-      });
-
-      if (!response.ok) throw new Error('Failed to update task');
-
-      const text = await response.text();
-      return text ? JSON.parse(text) : null;
-    } catch (error) {
-      console.error('Error updating task:', error);
-      throw new Error('Failed to update task. Please try again.');
-    }
+  // --- TASKS ---
+  async getTasks(token) {
+    const response = await fetch(`${BASE_URL}/api/Tasks`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error("Failed to fetch tasks");
+    return await response.json();
   },
 
-  // DELETE
-  async deleteTask(id) {
-    try {
-      const response = await fetch(`${BASE_URL}/api/Tasks/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete task');
-      return { success: true };
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      throw new Error('Failed to delete task. Please try again.');
-    }
+  async createTask(taskData, token) {
+    const response = await fetch(`${BASE_URL}/api/Tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(taskData),
+    });
+    if (!response.ok) throw new Error("Failed to create task");
+    return await response.json();
+  },
+
+  async updateTask(id, taskData, token) {
+    const response = await fetch(`${BASE_URL}/api/Tasks/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(taskData),
+    });
+    if (!response.ok) throw new Error("Failed to update task");
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  },
+
+  async deleteTask(id, token) {
+    const response = await fetch(`${BASE_URL}/api/Tasks/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error("Failed to delete task");
+    return { success: true };
   },
 };

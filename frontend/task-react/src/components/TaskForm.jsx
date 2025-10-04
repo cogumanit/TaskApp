@@ -1,8 +1,10 @@
-// TaskForm.jsx
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "./AuthContext";
 import { PlusIcon, TagIcon, ClockIcon, CalendarIcon } from "./Icons";
 
 export default function TaskForm({ onAddTask, isLoading }) {
+  const { token } = useContext(AuthContext);
+
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [category, setCategory] = useState("");
@@ -40,7 +42,7 @@ export default function TaskForm({ onAddTask, isLoading }) {
     };
 
     try {
-      const result = await onAddTask(taskData);
+      const result = await onAddTask(taskData, token);
       
       if (result?.success) {
         // Reset form on success
@@ -58,7 +60,7 @@ export default function TaskForm({ onAddTask, isLoading }) {
     } catch (error) {
       // Handle any thrown errors
       const errorMessage = error.message || "An unexpected error occurred.";
-      setErrors([errorMessage]);
+      setErrors([errorMessage || "An unexpected error occured. Please try again."]);
       throw error;
     }
   };

@@ -67,7 +67,7 @@ export default function TaskItem({
         estimateHours: editEstimateHours,
       };
       
-      await onUpdate(task.id, payload);
+      await onUpdate(task.id, payload, token);
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating task:", error);
