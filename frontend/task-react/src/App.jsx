@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { AuthProvider } from "./components/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import Login from "./components/Login";
+import SignInForm from "./components/SignInForm";
 import Register from "./components/Register";
 import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
@@ -18,7 +18,18 @@ export default function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Public routes */}
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={
+              <SignInForm
+                onLogin={(user) => {
+                  // Simulate login success or replace with your actual API
+                  localStorage.setItem("user", JSON.stringify(user));
+                  window.location.href = "/tasks"; // redirect after login
+                }}
+              />
+            }
+          />
           <Route path="/register" element={<Register />} />
 
           {/* Protected tasks route */}

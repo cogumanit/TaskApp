@@ -1,4 +1,6 @@
-// Icons.jsx
+// src/components/Icons.jsx
+
+// ===== Icons =====
 export const PlusIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -51,4 +53,35 @@ export const DownloadIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
   </svg>
+);
+
+
+export const Button = ({ children, onClick, type = "button", variant = "primary" }) => {
+  const base = "flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-colors";
+  const styles =
+    variant === "primary"
+      ? "bg-blue-600 text-white hover:bg-blue-700"
+      : variant === "secondary"
+      ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+      : "bg-red-600 text-white hover:bg-red-700";
+
+  return (
+    <button type={type} onClick={onClick} className={`${base} ${styles}`}>
+      {children}
+    </button>
+  );
+};
+
+// Input
+export const Input = ({ label, type = "text", value, onChange, placeholder }) => (
+  <div className="flex flex-col gap-1 w-full">
+    {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
 );

@@ -1,38 +1,13 @@
-// src/pages/Register.jsx
+// src/pages/Login.jsx
 import React, { useState } from "react";
 
-const Register = ({ onRegister }) => {
+const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    try {
-      // Replace this with your backend register API
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("user", JSON.stringify(data));
-        window.location.href = "/tasks"; // redirect after register
-      } else {
-        setError("Registration failed. Try again.");
-      }
-    } catch (err) {
-      setError("Server error. Please try later.");
-    }
+    onLogin?.({ email, password });
   };
 
   return (
@@ -42,14 +17,8 @@ const Register = ({ onRegister }) => {
         className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg space-y-6"
       >
         <h1 className="text-2xl font-semibold text-center text-gray-800">
-          Create Account
+          Sign In
         </h1>
-
-        {error && (
-          <div className="bg-red-50 text-red-600 text-sm p-2 rounded-lg">
-            {error}
-          </div>
-        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -79,31 +48,17 @@ const Register = ({ onRegister }) => {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Confirm Password
-          </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            placeholder="Re-enter your password"
-            required
-          />
-        </div>
-
         <button
           type="submit"
           className="w-full flex justify-center items-center gap-2 rounded-lg bg-indigo-600 text-white font-medium py-2 hover:bg-indigo-700 transition-colors"
         >
-          Sign Up
+          Sign In
         </button>
 
         <p className="text-center text-sm text-gray-500">
-          Already have an account?{" "}
-          <a href="/login" className="text-indigo-600 hover:underline">
-            Sign In
+          Don’t have an account?{" "}
+          <a href="/register" className="text-indigo-600 hover:underline">
+            Register
           </a>
         </p>
       </form>
@@ -111,4 +66,4 @@ const Register = ({ onRegister }) => {
   );
 };
 
-export default Register;
+export default Login;
