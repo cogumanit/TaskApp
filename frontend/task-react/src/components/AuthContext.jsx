@@ -1,46 +1,42 @@
+// src/components/AuthContext.jsx
 import React, { createContext, useState, useEffect } from "react";
+import { api } from "../api";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
 
+  // Keep token & user synced with localStorage
   useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token");
-    }
+    if (token) localStorage.setItem("token", token);
+    else localStorage.removeItem("token");
   }, [token]);
 
-  const login = async (email, password) => {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  useEffect(() => {
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
+  }, [user]);
 
-    if (!res.ok) throw new Error("Login failed");
-    const data = await res.json();
+  const login = async (email, password) => {
+    const data = await api.login({ email, password });
     setToken(data.token);
-    setUser({ email });
+    setUser(data.user || { email });
   };
 
   const register = async (email, password) => {
-    const res = await fetch("http://localhost:5000/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!res.ok) throw new Error("Register failed");
-    return await res.json();
+    const data = await api.register({ email, password });
+    return data;
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
+    localStorage.removeItem("user");
     localStorage.removeItem("token");
   };
 

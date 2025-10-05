@@ -82,12 +82,18 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "http://localhost:5121")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:5173", 
+                "http://task-frontend", 
+                "http://frontend"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
+
 
 var app = builder.Build();
 
@@ -104,8 +110,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 
-// Enable CORS before mapping controllers
-app.UseCors("DevCors");
+app.UseCors("AllowFrontend");
 
 app.MapControllers();
 

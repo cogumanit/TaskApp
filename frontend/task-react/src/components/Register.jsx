@@ -1,37 +1,34 @@
-// src/pages/Register.jsx
-import React, { useState } from "react";
+// src/components/Register.jsx
+import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
-const Register = ({ onRegister }) => {
+export default function Register() {
+  const { register } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
+    setLoading(true);
     try {
-      // Replace this with your backend register API
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("user", JSON.stringify(data));
-        window.location.href = "/tasks"; // redirect after register
-      } else {
-        setError("Registration failed. Try again.");
-      }
-    } catch (err) {
-      setError("Server error. Please try later.");
+      await register(email, password);
+      navigate("/login");
+    } catch {
+      setError("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,20 +92,19 @@ const Register = ({ onRegister }) => {
 
         <button
           type="submit"
-          className="w-full flex justify-center items-center gap-2 rounded-lg bg-indigo-600 text-white font-medium py-2 hover:bg-indigo-700 transition-colors"
+          disabled={loading}
+          className="w-full flex justify-center items-center gap-2 rounded-lg bg-indigo-600 text-white font-medium py-2 hover:bg-indigo-700 transition-colors disabled:opacity-50"
         >
-          Sign Up
+          {loading ? "Creating account..." : "Sign Up"}
         </button>
 
         <p className="text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <a href="/login" className="text-indigo-600 hover:underline">
+          <Link to="/login" className="text-indigo-600 hover:underline">
             Sign In
-          </a>
+          </Link>
         </p>
       </form>
     </div>
   );
-};
-
-export default Register;
+}

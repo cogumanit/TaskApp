@@ -5,9 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import SignInForm from "./components/SignInForm";
 import Register from "./components/Register";
-import TaskForm from "./components/TaskForm";
-import TaskList from "./components/TaskList";
-import ErrorMessage from "./components/ErrorMessage";
+import TaskPage from "./components/TaskPage";
 
 export default function App() {
   return (
@@ -18,18 +16,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Public routes */}
-          <Route
-            path="/login"
-            element={
-              <SignInForm
-                onLogin={(user) => {
-                  // Simulate login success or replace with your actual API
-                  localStorage.setItem("user", JSON.stringify(user));
-                  window.location.href = "/tasks"; // redirect after login
-                }}
-              />
-            }
-          />
+          <Route path="/login" element={<SignInForm />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected tasks route */}
@@ -37,24 +24,7 @@ export default function App() {
             path="/tasks"
             element={
               <ProtectedRoute>
-                <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-                  <header className="max-w-4xl mx-auto px-6 py-8">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                          Tasks
-                        </h1>
-                        <p className="text-gray-600">Create a task and it will appear below.</p>
-                      </div>
-                    </div>
-                  </header>
-
-                  <main className="max-w-4xl mx-auto px-6 pb-8 space-y-8">
-                    <TaskForm />
-                    <ErrorMessage />
-                    <TaskList />
-                  </main>
-                </div>
+                <TaskPage />
               </ProtectedRoute>
             }
           />

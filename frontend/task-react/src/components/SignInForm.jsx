@@ -1,13 +1,28 @@
-// src/pages/Login.jsx
-import React, { useState } from "react";
+// src/components/SignInForm.jsx
+import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
-const Login = ({ onLogin }) => {
+export default function SignInForm() {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin?.({ email, password });
+    setError("");
+    setLoading(true);
+    try {
+      await login(email, password);
+      navigate("/tasks");
+    } catch (err) {
+      setError("Invalid email or password.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -19,6 +34,12 @@ const Login = ({ onLogin }) => {
         <h1 className="text-2xl font-semibold text-center text-gray-800">
           Sign In
         </h1>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 text-sm p-2 rounded-lg">
+            {error}
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -50,20 +71,19 @@ const Login = ({ onLogin }) => {
 
         <button
           type="submit"
-          className="w-full flex justify-center items-center gap-2 rounded-lg bg-indigo-600 text-white font-medium py-2 hover:bg-indigo-700 transition-colors"
+          disabled={loading}
+          className="w-full flex justify-center items-center gap-2 rounded-lg bg-indigo-600 text-white font-medium py-2 hover:bg-indigo-700 transition-colors disabled:opacity-50"
         >
-          Sign In
+          {loading ? "Signing in..." : "Sign In"}
         </button>
 
         <p className="text-center text-sm text-gray-500">
           Don’t have an account?{" "}
-          <a href="/register" className="text-indigo-600 hover:underline">
+          <Link to="/register" className="text-indigo-600 hover:underline">
             Register
-          </a>
+          </Link>
         </p>
       </form>
     </div>
   );
-};
-
-export default Login;
+}

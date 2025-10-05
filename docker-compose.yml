@@ -10,6 +10,8 @@ services:
       - VITE_API_URL=http://dotnet-backend:5000
     depends_on:
       - backend
+    networks:
+      - tasknet
 
   backend:
     build: ./backend/TaskApi
@@ -21,6 +23,8 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=TaskLearningDb;User Id=sa;Password=Your_password123;TrustServerCertificate=True;
     depends_on:
       - sqlserver
+    networks:
+      - tasknet
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -32,6 +36,12 @@ services:
       - "1433:1433"
     volumes:
       - sql_data:/var/opt/mssql
+    networks:
+      - tasknet
 
 volumes:
   sql_data:
+
+networks:
+  tasknet:
+    driver: bridge
