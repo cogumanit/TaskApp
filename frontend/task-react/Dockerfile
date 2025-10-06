@@ -2,6 +2,7 @@ FROM node:22.12.0-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
+RUN npm install recharts
 COPY . .
 RUN npm run build
 

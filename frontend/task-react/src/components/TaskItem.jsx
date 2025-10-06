@@ -1,4 +1,3 @@
-// TaskItem.jsx
 import { useState } from "react";
 import { EditIcon, TrashIcon, CheckIcon, XIcon, TagIcon, ClockIcon, CalendarIcon } from "./Icons";
 

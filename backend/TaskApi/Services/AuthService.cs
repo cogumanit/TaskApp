@@ -11,9 +11,10 @@ namespace TaskApi.Services
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ITokenService _tokenService;
 
+        // injects constructor, dependencies are hidden
         public AuthService(IUserRepository userRepo, IPasswordHasher<User> passwordHasher, ITokenService tokenService)
         {
-            _userRepo = userRepo;
+            _userRepo = userRepo; // private fields
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;
         }

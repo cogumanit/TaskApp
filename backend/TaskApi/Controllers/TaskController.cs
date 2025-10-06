@@ -3,25 +3,50 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using TaskApi.Data;
 using TaskApi.Models;
+using TaskApi.DTOs;
+using System.Security.Claims;
 
 namespace TaskApi.Controllers
 {
     [ApiController]
     [Authorize]
-    [Route("api/[controller]")] // -> /api/tasks
+    [Route("api/[controller]")]
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _db;
 
         public TasksController(AppDbContext db) => _db = db;
 
+        // Helper method to get current user ID
+        private Guid GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                throw new UnauthorizedAccessException("User not authenticated");
+            
+            return Guid.Parse(userIdClaim);
+        }
+
         // READ ALL: GET /api/tasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TaskItem>>> GetAll()
+        public async Task<ActionResult<IEnumerable<TaskResponseDto>>> GetAll()
         {
+            var userId = GetCurrentUserId();
+            
             var items = await _db.Tasks
+                .Where(t => t.UserId == userId)
                 .OrderBy(t => t.IsDone)
                 .ThenBy(t => t.DueDate)
+                .Select(t => new TaskResponseDto
+                {
+                    Id = t.Id,
+                    UserId = t.UserId,
+                    Title = t.Title,
+                    IsDone = t.IsDone,
+                    DueDate = t.DueDate,
+                    Category = t.Category,
+                    EstimateHours = t.EstimateHours
+                })
                 .ToListAsync();
 
             return Ok(items);
@@ -29,9 +54,24 @@ namespace TaskApi.Controllers
 
         // READ ONE: GET /api/tasks/{id}
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<TaskItem>> GetById(int id)
+        public async Task<ActionResult<TaskResponseDto>> GetById(int id)
         {
-            var item = await _db.Tasks.FindAsync(id);
+            var userId = GetCurrentUserId();
+            
+            var item = await _db.Tasks
+                .Where(t => t.Id == id && t.UserId == userId)
+                .Select(t => new TaskResponseDto
+                {
+                    Id = t.Id,
+                    UserId = t.UserId,
+                    Title = t.Title,
+                    IsDone = t.IsDone,
+                    DueDate = t.DueDate,
+                    Category = t.Category,
+                    EstimateHours = t.EstimateHours
+                })
+                .FirstOrDefaultAsync();
+            
             if (item == null) return NotFound();
 
             return Ok(item);
@@ -39,8 +79,10 @@ namespace TaskApi.Controllers
 
         // CREATE: POST /api/tasks
         [HttpPost]
-        public async Task<ActionResult<TaskItem>> Create(TaskItem dto)
+        public async Task<ActionResult<TaskResponseDto>> Create([FromBody] TaskResponseDto dto)
         {
+            var userId = GetCurrentUserId();
+            
             // Validation
             if (string.IsNullOrWhiteSpace(dto.Title))
                 return BadRequest("Title is required.");
@@ -51,20 +93,40 @@ namespace TaskApi.Controllers
             if (dto.EstimateHours < 0)
                 return BadRequest("Estimate hours must be non-negative.");
 
-            _db.Tasks.Add(dto);
+            var taskItem = new TaskItem
+            {
+                UserId = userId,
+                Title = dto.Title,
+                IsDone = dto.IsDone,
+                DueDate = dto.DueDate,
+                Category = dto.Category,
+                EstimateHours = dto.EstimateHours
+            };
+
+            _db.Tasks.Add(taskItem);
             await _db.SaveChangesAsync();
 
-            // Returns 201 with Location header pointing to GET by id
-            return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
+            var response = new TaskResponseDto
+            {
+                Id = taskItem.Id,
+                UserId = taskItem.UserId,
+                Title = taskItem.Title,
+                IsDone = taskItem.IsDone,
+                DueDate = taskItem.DueDate,
+                Category = taskItem.Category,
+                EstimateHours = taskItem.EstimateHours
+            };
+
+            return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
         }
 
         // UPDATE: PUT /api/tasks/{id}
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, TaskItem dto)
+        public async Task<IActionResult> Update(int id, [FromBody] TaskResponseDto dto)
         {
-            if (id != dto.Id)
-                return BadRequest("ID mismatch.");
-
+            var userId = GetCurrentUserId();
+            
+            // Validation
             if (string.IsNullOrWhiteSpace(dto.Title))
                 return BadRequest("Title is required.");
 
@@ -74,10 +136,19 @@ namespace TaskApi.Controllers
             if (dto.EstimateHours < 0)
                 return BadRequest("Estimate hours must be non-negative.");
 
-            var exists = await _db.Tasks.AnyAsync(t => t.Id == id);
-            if (!exists) return NotFound();
+            var taskItem = await _db.Tasks
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+            
+            if (taskItem == null) 
+                return NotFound();
 
-            _db.Entry(dto).State = EntityState.Modified;
+            // Update properties
+            taskItem.Title = dto.Title;
+            taskItem.IsDone = dto.IsDone;
+            taskItem.DueDate = dto.DueDate;
+            taskItem.Category = dto.Category;
+            taskItem.EstimateHours = dto.EstimateHours;
+
             await _db.SaveChangesAsync();
 
             return NoContent();
@@ -87,8 +158,13 @@ namespace TaskApi.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await _db.Tasks.FindAsync(id);
-            if (item == null) return NotFound();
+            var userId = GetCurrentUserId();
+            
+            var item = await _db.Tasks
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+            
+            if (item == null) 
+                return NotFound();
 
             _db.Tasks.Remove(item);
             await _db.SaveChangesAsync();
@@ -96,4 +172,4 @@ namespace TaskApi.Controllers
             return NoContent();
         }
     }
-}   
+}

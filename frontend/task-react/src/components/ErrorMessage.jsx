@@ -1,4 +1,3 @@
-// ErrorMessage.jsx
 import { XIcon } from "./Icons";
 
 export default function ErrorMessage({ errors, onDismiss }) {

@@ -7,9 +7,12 @@ namespace TaskApi.Models
     public class TaskItem
     {
         public int Id { get; set; } // Primary Key by convention (Table: Tasks, Column: Id)
+        
         public string Title { get; set; } = ""; // Required (we'll also validate in the controller)
         public bool IsDone { get; set; } = false; // Simple status flag
         public DateTime? DueDate { get; set; } // Nullable → optional due date
+        public Guid UserId { get; set; } // Foreign Key to User
+        public User? User { get; set; } // Navigation property to User
 
         [Required]
         [MaxLength(50)]
